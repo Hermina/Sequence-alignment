@@ -1,0 +1,63 @@
+function [K] = alignment (X,Y)
+cost=0;
+d=1;
+a=2;
+m=length(X);
+n=length(Y);
+B=zeros(m+1,n+1);
+for i=0:m
+    B(i+1,1)=d*i;
+end
+for j=0:n
+    B(1,j+1)=d*j;
+end
+for j=1:n
+    for i=1:m
+        if X(i)==Y(j)
+            a=0;
+        end
+        T=[a+B(i,j),d+B(i,j+1),d+B(i+1,j)];
+        B(i+1,j+1)=min(T);
+        a=2;
+    end
+end
+cost=cost+B(m+1,n+1);
+L=zeros(m+n,2);
+j=0;
+k=0;
+for i=1:m+n
+    a=2;
+    if(k>=m)
+        for s=j:n-1
+            L(i+s-j,1:2)=[0,n-s];
+        end
+        l=i+n-1-j;
+        break;
+    end
+    if(j>=n)
+        for s=k:m-1
+            L(i+s-k,1:2)=[m-s,0];
+        end
+        l=i+m-1-k;
+        break;
+    end
+    if X(m-k)==Y(n-j)
+        a=0;
+    end
+    if B(m+1-k,n+1-j)-a==B(m-k,n-j)
+        L(i,1:2)=[m-k,n-j];
+        j=j+1;
+        k=k+1;
+    else if B(m+1-k,n+1-j)-d==B(m-k,n+1-j)
+        L(i,1:2)=[m-k,n-j];
+        k=k+1;
+        else
+            if B(m+1-k,n+1-j)-d==B(m-k+1,n-j)
+            L(i,1:2)=[m-k,n-j];
+            j=j+1;
+            end
+        end
+    end
+end
+K=L(2:l,1:2);
+end
